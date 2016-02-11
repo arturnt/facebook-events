@@ -5,7 +5,7 @@ module.exports = function (config, pageType, pageData) {
         content_name: product.name, //product name
         //content_category: 'Apparel & Accessories > Shoes', //product category
         content_ids: [product[0].id], //array of product SKUs
-        content_type: 'product', //should be 'product' on product pages or 'product_group' on category pages
+        content_type: 'product_group', //should be 'product_group' on all pages
         value: product[0].msrpInCents/100, //product price – leave blank on category pages
         currency: 'USD'
       });
