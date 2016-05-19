@@ -1,4 +1,24 @@
 module.exports = function (config, pageType, pageData) { 
+
+  function shouldFire(pageType, eventTrigger) {
+    var check = false;
+
+    if (!config.event) {
+      check = true;
+    }
+
+    if(pageType === Symphony.pageType) {
+      _.each(config.event, function(value, index) {
+        if(eventTrigger === value) {
+          check = true;
+        }
+      });
+    } 
+    
+    return check;
+  }
+
+
   var pageTypes = {
     product: function(product) {
       fbq('track', 'ViewContent', {
@@ -9,6 +29,19 @@ module.exports = function (config, pageType, pageData) {
         value: product[0].msrpInCents/100, //product price – leave blank on category pages
         currency: 'USD'
       });
+
+      if (shouldFire("product", "AddToCart")) { 
+        $('button.add-to-cart').click(function() { 
+          fbq('track', 'AddToCart', {
+            content_name: product.name, //product name
+            //content_category: 'Apparel & Accessories > Shoes', //product category
+            content_ids: product[0].id, //array of product SKUs
+            content_type: 'product_group', //should be 'product_group' on all pages
+            value: product[0].msrpInCents/100, //product price – leave blank on category pages
+            currency: 'USD'
+          });
+        });
+      }
     },
     store: function(store) {
       fbq('track', 'ViewContent', {
@@ -23,15 +56,17 @@ module.exports = function (config, pageType, pageData) {
       });
     },
     cart: function(cart) {
-      fbq('track', 'AddToCart', {
-        content_name: 'Shopping Cart',         
-        content_ids: _.map(cart.lineItems, function(lineItem) {
-          return lineItem.product.id;
-        }), //array of product SKUs in the cart
-        content_type: 'product_group', //should be 'product' for single items or 'product_group' for multiple items
-        value: cart.financial.subtotal/100, //total value of all products in the cart
-        currency: 'USD'
-      });
+      if (shouldFire("cart", "AddToCart")) {
+        fbq('track', 'AddToCart', {
+          content_name: 'Shopping Cart',         
+          content_ids: _.map(cart.lineItems, function(lineItem) {
+            return lineItem.product.id;
+          }), //array of product SKUs in the cart
+          content_type: 'product_group', //should be 'product' for single items or 'product_group' for multiple items
+          value: cart.financial.subtotal/100, //total value of all products in the cart
+          currency: 'USD'
+        });
+      }
 
       fbq('track', 'InitiateCheckout');
     },
@@ -56,6 +91,12 @@ module.exports = function (config, pageType, pageData) {
   fbq('init', config.pixelId);
   fbq('track', 'PageView');
 
+  if (config.eventType) {
+    config.eventType.forEach(function(event) {
+      fbq('track', event);
+    });
+  }
+
   SymphonyAPI(["page", "product", "cart", "order", "store", function(page, product, cart, order, store) {
     if (window.location.pathname === '/search') {
       fbq('track', 'Search');
@@ -69,8 +110,8 @@ module.exports = function (config, pageType, pageData) {
       product: product
     };
 
-    var pageFunction = pageTypes[page.type];
-    pageFunction && pageFunction(symphonyObj[page.type]);
+    var pageFunction = pageTypes[page.type.toLowerCase()];
+    pageFunction && pageFunction(symphonyObj[page.type.toLowerCase()]);
   }]);
   
 
