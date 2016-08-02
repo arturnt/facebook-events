@@ -113,7 +113,10 @@ module.exports = function (config, pageType, pageData) {
     var pageFunction = pageTypes[page.type.toLowerCase()];
     pageFunction && pageFunction(symphonyObj[page.type.toLowerCase()]);
   }]);
-  
+ 
+  $(window).on("EMAIL_SUBSCRIBE", function() {
+    fbq('track', 'Lead');
+  });
 
   var thisPixel = {
     name: "Facebook Events",
