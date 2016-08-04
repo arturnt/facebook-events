@@ -1,12 +1,15 @@
 module.exports = function (config, pageType, pageData) { 
 
+  //check for preferred content type, otherwise default to 'product_group'
+  var content_type = config.content_type || "product_group";
+
   function shouldFire(pageType, eventTrigger) {
     var check = false;
 
     if (!config.event) {
       check = true;
     }
-
+    
     if(pageType === Symphony.pageType) {
       _.each(config.event, function(value, index) {
         if(eventTrigger === value) {
@@ -21,11 +24,12 @@ module.exports = function (config, pageType, pageData) {
 
   var pageTypes = {
     product: function(product) {
+       
       fbq('track', 'ViewContent', {
         content_name: product.name, //product name
         //content_category: 'Apparel & Accessories > Shoes', //product category
         content_ids: product[0].id, //array of product SKUs
-        content_type: 'product_group', //should be 'product_group' on all pages
+        content_type: content_type, //determined by config 
         value: product[0].msrpInCents/100, //product price – leave blank on category pages
         currency: 'USD'
       });
@@ -36,7 +40,7 @@ module.exports = function (config, pageType, pageData) {
             content_name: product.name, //product name
             //content_category: 'Apparel & Accessories > Shoes', //product category
             content_ids: product[0].id, //array of product SKUs
-            content_type: 'product_group', //should be 'product_group' on all pages
+            content_type: content_type, //determined by config
             value: product[0].msrpInCents/100, //product price – leave blank on category pages
             currency: 'USD'
           });
@@ -50,7 +54,7 @@ module.exports = function (config, pageType, pageData) {
         content_ids: _.map(store.products, function(product) {
           return product.id;
         }), //array of product SKUs
-        content_type: 'product_group', //should be 'product' on product pages or 'product_group' on category pages
+        content_type: content_type, //determined by config
         //value: pageData[0].msrpInCents/100, //product price – leave blank on category pages
         currency: 'USD'
       });
@@ -62,7 +66,7 @@ module.exports = function (config, pageType, pageData) {
           content_ids: _.map(cart.lineItems, function(lineItem) {
             return lineItem.product.id;
           }), //array of product SKUs in the cart
-          content_type: 'product_group', //should be 'product' for single items or 'product_group' for multiple items
+          content_type: content_type, // determined by config
           value: cart.financial.subtotal/100, //total value of all products in the cart
           currency: 'USD'
         });
@@ -75,7 +79,7 @@ module.exports = function (config, pageType, pageData) {
         content_ids: _.map(order.lineItems, function(lineItem) {
           return lineItem.product.id;
         }),
-        content_type: 'product_group', //should be 'product' for single items or 'product_group' for multiple items
+        content_type: content_type, //determined by config
         value: order.orderFinancial.subtotal/100, //order subtotal
        currency: 'USD'                        
       });
@@ -127,3 +131,4 @@ module.exports = function (config, pageType, pageData) {
   Symphony.activePixels = Symphony.activePixels || [];
   Symphony.activePixels.push(thisPixel);
 };
+
