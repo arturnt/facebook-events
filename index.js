@@ -97,7 +97,7 @@ module.exports = function (config, pageType, pageData) {
     });
   }
 
-  SymphonyAPI(["page", "product", "cart", "order", "store", function(page, product, cart, order, store) {
+  Symphony.apiReady(["page", "product", "cart", "order", "store", function(page, product, cart, order, store) {
     if (window.location.pathname === '/search') {
       fbq('track', 'Search');
       return;
