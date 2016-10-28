@@ -1,0 +1,22 @@
+{
+    "snippetName":"facebook-events",
+    "snippetType":"pixel",
+    "longName":"Facebook Event Pixel",
+    "description":"This is a snippet for Facebook conversion pixel.",
+    "keywords":["facebook","pixel"],
+    "blacklist":[],
+    "configDetails": [{
+        "sectionName":"All Pages",
+        "sectionKey":"all-pages",
+        "collapsible":true,
+        "enabled":false,
+        "configs":[{
+          "label": "Pixel Id",
+          "name": "pixelId",
+          "placeholder": "",
+          "priority": 0,
+          "required": true,
+          "type": "number"
+        }]
+    }]
+}
