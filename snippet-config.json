@@ -11,7 +11,7 @@
         "collapsible":true,
         "enabled":false,
         "configs":[{
-          "label": "Pixel Id",
+          "label": "Pixel ID",
           "name": "pixelId",
           "placeholder": "12345",
           "priority": 0,
