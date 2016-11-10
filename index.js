@@ -60,7 +60,7 @@ module.exports = function (config, pageType, pageData) {
       });
     },
     cart: function(cart) {
-      if (shouldFire("cart", "AddToCart")) {
+      if (!shouldFire("cart", "AddToCart")) {
         fbq('track', 'AddToCart', {
           content_name: 'Shopping Cart',         
           content_ids: _.map(cart.lineItems, function(lineItem) {
