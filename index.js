@@ -1,4 +1,4 @@
-module.exports = function (config, pageType, pageData) { 
+module.exports = function (config, pageType, pageData) {
 
   //check for preferred content type, otherwise default to 'product_group'
   var content_type = config.content_type || "product_group";
@@ -9,33 +9,33 @@ module.exports = function (config, pageType, pageData) {
     if (!config.event) {
       check = true;
     }
-    
+
     if(pageType === Symphony.pageType) {
       _.each(config.event, function(value, index) {
         if(eventTrigger === value) {
           check = true;
         }
       });
-    } 
-    
+    }
+
     return check;
   }
 
 
   var pageTypes = {
     product: function(product) {
-       
+
       fbq('track', 'ViewContent', {
         content_name: product.name, //product name
         //content_category: 'Apparel & Accessories > Shoes', //product category
         content_ids: product[0].id, //array of product SKUs
-        content_type: content_type, //determined by config 
+        content_type: content_type, //determined by config
         value: product[0].msrpInCents/100, //product price – leave blank on category pages
         currency: 'USD'
       });
 
-      if (shouldFire("product", "AddToCart")) { 
-        $('button.add-to-cart').click(function() { 
+      if (shouldFire("product", "AddToCart")) {
+        $('button.add-to-cart').click(function() {
           fbq('track', 'AddToCart', {
             content_name: product.name, //product name
             //content_category: 'Apparel & Accessories > Shoes', //product category
@@ -62,7 +62,7 @@ module.exports = function (config, pageType, pageData) {
     cart: function(cart) {
       if (shouldFire("cart", "AddToCart")) {
         fbq('track', 'AddToCart', {
-          content_name: 'Shopping Cart',         
+          content_name: 'Shopping Cart',
           content_ids: _.map(cart.lineItems, function(lineItem) {
             return lineItem.product.id;
           }), //array of product SKUs in the cart
@@ -81,7 +81,7 @@ module.exports = function (config, pageType, pageData) {
         }),
         content_type: content_type, //determined by config
         value: order.orderFinancial.subtotal/100, //order subtotal
-       currency: 'USD'                        
+       currency: 'USD'
       });
     }
   };
@@ -91,7 +91,7 @@ module.exports = function (config, pageType, pageData) {
   n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s);}(window,
   document,'script','//connect.facebook.net/en_US/fbevents.js');
-   
+
   fbq('init', config.pixelId);
   fbq('track', 'PageView');
 
@@ -114,10 +114,10 @@ module.exports = function (config, pageType, pageData) {
       product: product
     };
 
-    var pageFunction = pageTypes[page.type.toLowerCase()];
-    pageFunction && pageFunction(symphonyObj[page.type.toLowerCase()]);
+    var pageFunction = pageTypes[window.Symphony.pageType];
+    pageFunction && pageFunction(symphonyObj[window.Symphony.pageType]);
   }]);
- 
+
   $(window).on("EMAIL_SUBSCRIBE", function() {
     fbq('track', 'Lead');
   });
@@ -127,7 +127,7 @@ module.exports = function (config, pageType, pageData) {
     config: config,
     url: require("./package").repository.url
   };
-  
+
   Symphony.activePixels = Symphony.activePixels || [];
   Symphony.activePixels.push(thisPixel);
 };
