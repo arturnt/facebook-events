@@ -9,7 +9,6 @@
         "sectionName":"All Pages",
         "sectionKey":"all-pages",
         "collapsible":true,
-        "enabled":false,
         "configs":[{
           "label": "Pixel ID",
           "name": "pixelId",
