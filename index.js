@@ -21,14 +21,15 @@ module.exports = function (config, pageType, pageData) {
     return check;
   }
 
-
+  var variantSelected   = "";
   var pageTypes = {
     product: function(product) {
-
       fbq('track', 'ViewContent', {
-        content_name: product.name, //product name
+        content_name: product[0].name, //product name -- should be product[0].name
         //content_category: 'Apparel & Accessories > Shoes', //product category
-        content_ids: product[0].id, //array of product SKUs
+        content_ids: _.map(product[0].variants, function(variant) { //array of product SKUs
+          return product[0].tagLine + "-" + variant.vendorSku;
+        }), 
         content_type: content_type, //determined by config
         value: product[0].msrpInCents/100, //product price – leave blank on category pages
         currency: 'USD'
@@ -36,12 +37,15 @@ module.exports = function (config, pageType, pageData) {
 
       if (shouldFire("product", "AddToCart")) {
         $('button.add-to-cart').click(function() {
+          variantSelected = $('[ng-controller="ProductAttrCtrl"]').scope().getSelectedVariant().vendorSKUId;
           fbq('track', 'AddToCart', {
-            content_name: product.name, //product name
+            content_name: product[0].name, //product name
             //content_category: 'Apparel & Accessories > Shoes', //product category
-            content_ids: product[0].id, //array of product SKUs
+            content_ids: _.map(product, function(productCluster) { //array of product SKUs
+              return productCluster.tagLine + "-" + variantSelected;
+            }), //array of a single product SKUs appended to the product cluster tagline
             content_type: content_type, //determined by config
-            value: product[0].msrpInCents/100, //product price – leave blank on category pages
+            value: product[0].defaultPriceInCents/100, //product price – leave blank on category pages
             currency: 'USD'
           });
         });
@@ -60,11 +64,12 @@ module.exports = function (config, pageType, pageData) {
       });
     },
     cart: function(cart) {
+      let cartLineItems = $('[ng-controller="CheckoutBetaCtrl"]').scope().getCheckoutState().lineItems.all;
       if (shouldFire("cart", "AddToCart")) {
         fbq('track', 'AddToCart', {
           content_name: 'Shopping Cart',
-          content_ids: _.map(cart.lineItems, function(lineItem) {
-            return lineItem.product.id;
+          content_ids: _.map(cartLineItems, function(lineItem) {
+            return lineItem.product.tagLine + "-" + lineItem.productSku;
           }), //array of product SKUs in the cart
           content_type: content_type, // determined by config
           value: cart.financial.subtotal/100, //total value of all products in the cart
@@ -77,7 +82,7 @@ module.exports = function (config, pageType, pageData) {
     order: function(order) {
       fbq('track', 'Purchase', {
         content_ids: _.map(order.lineItems, function(lineItem) {
-          return lineItem.product.id;
+          return lineItem.product.tagLine + "-" + lineItem.productSku;
         }),
         content_type: content_type, //determined by config
         value: order.orderFinancial.subtotal/100, //order subtotal
@@ -131,4 +136,3 @@ module.exports = function (config, pageType, pageData) {
   Symphony.activePixels = Symphony.activePixels || [];
   Symphony.activePixels.push(thisPixel);
 };
-
