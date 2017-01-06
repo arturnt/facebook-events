@@ -31,7 +31,7 @@ module.exports = function (config, pageType, pageData) {
           return product[0].tagLine + "-" + variant.vendorSku;
         }), 
         content_type: content_type, //determined by config
-        value: product[0].msrpInCents/100, //product price – leave blank on category pages
+        value: product[0].defaultPriceInCents/100, //product price – leave blank on category pages
         currency: 'USD'
       });
 
