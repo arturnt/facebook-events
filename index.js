@@ -1,4 +1,4 @@
-module.exports = function (config, pageType, pageData) {
+module.exports = function (config, pageType) {
 
   //check for preferred content type, otherwise default to 'product_group'
   var content_type = config.content_type || "product_group";
@@ -11,7 +11,7 @@ module.exports = function (config, pageType, pageData) {
     }
 
     if(pageType === Symphony.pageType) {
-      _.each(config.event, function(value, index) {
+      _.each(config.event, function(value) {
         if(eventTrigger === value) {
           check = true;
         }
