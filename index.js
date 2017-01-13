@@ -1,4 +1,4 @@
-module.exports = function (config, pageType) {
+module.exports = function (config) {
 
   //check for preferred content type, otherwise default to 'product_group'
   var content_type = config.content_type || "product_group";
