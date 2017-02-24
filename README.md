@@ -14,6 +14,8 @@ If config.eventType is set, then all values in config.eventType will send as an 
 
 config.event only takes on value in the array: AddToCart - this will allow the code to track add to cart events on the product pages. This will also send an AddToCart event on the /cart page, which actually sends ALL line items in the cart. 
 
+If you want to send purchase data that indicates whether it is a subscription or single purchase, then use subscriptionCheck: true
+
 Use:
 ```
 "all-pages": {
@@ -21,7 +23,8 @@ Use:
     "config": {
       "pixelId": PIXEL_ID,
       "event": ["AddToCart"],
-      "eventType": ["InitiateCheckout", "AddToCart"]
+      "eventType": ["InitiateCheckout", "AddToCart"],
+      "subscriptionCheck": BOOLEAN
     },
     "active": true
   }

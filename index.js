@@ -3,6 +3,9 @@ module.exports = function (config) {
   //check for preferred content type, otherwise default to 'product_group'
   var content_type = config.content_type || "product_group";
 
+  //check config for option to check for subscriptions in order
+  var subscriptionCheck = config.subscriptionCheck || false;
+
   function shouldFire(pageType, eventTrigger) {
     var check = false;
 
@@ -75,13 +78,24 @@ module.exports = function (config) {
       fbq('track', 'InitiateCheckout');
     },
     order: function(order) {
-      fbq('track', 'Purchase', {
-        content_ids: _.map(order.lineItems, function(lineItem) {
+
+      function getPurchaseType() {
+        if(subscriptionCheck && order.originalCart.containsSubscriptions) {
+          return 'subscriptionPurchase';
+        } else if (subscriptionCheck) {
+          return 'singlePurchase';
+        } else {
+          return 'Purchase';
+        }
+      }
+
+      fbq('track', getPurchaseType() , {
+        content_ids: _.map(order.lineItems, function (lineItem) {
           return lineItem.product.id;
         }),
         content_type: content_type, //determined by config
-        value: order.orderFinancial.subtotal/100, //order subtotal
-       currency: 'USD'
+        value: order.orderFinancial.subtotal / 100, //order subtotal
+        currency: 'USD'
       });
     }
   };
