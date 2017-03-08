@@ -84,12 +84,23 @@ module.exports = function (config) {
           return 'subscriptionPurchase';
         } else if (subscriptionCheck) {
           return 'singlePurchase';
-        } else {
-          return 'Purchase';
         }
       }
 
-      fbq('track', getPurchaseType() , {
+      if(subscriptionCheck) {
+        //For sending Single Purchase / Subscription Purchase data
+        fbq('track', getPurchaseType(), {
+          content_ids: _.map(order.lineItems, function (lineItem) {
+            return lineItem.product.id;
+          }),
+          content_type: content_type, //determined by config
+          value: order.orderFinancial.subtotal / 100, //order subtotal
+          currency: 'USD'
+        });
+      }
+
+      //Send the original purchase code as well
+      fbq('track', 'Purchase' , {
         content_ids: _.map(order.lineItems, function (lineItem) {
           return lineItem.product.id;
         }),
