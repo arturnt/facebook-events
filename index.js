@@ -52,14 +52,18 @@ module.exports = function (config, pageType, pageData) {
       }
     },
     store: function(store) {
+      var productList = $('[ng-controller="ProductListCtrl"]').scope().productClusters;
+      var content = [];
+      _.forEach(productList, function(product) {
+        _.forEach(product.variants, function(variant) {
+          content.push(product.tagLine + "-" + variant.vendorSKUId);
+        })
+      })
+
       fbq('track', 'ViewContent', {
-        console.log("store: ");
-        console.log(store);
         //content_name: pageData[0].name, //product name
         content_category: store.name, //product category
-        content_ids: _.map(store.products, function(product) {
-          return product.id;
-        }), //array of product SKUs
+        content_ids: content, //array of product SKUs
         content_type: content_type, //determined by config
         //value: pageData[0].msrpInCents/100, //product price – leave blank on category pages
         currency: 'USD'
