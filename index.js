@@ -53,6 +53,8 @@ module.exports = function (config, pageType, pageData) {
     },
     store: function(store) {
       fbq('track', 'ViewContent', {
+        console.log("store: ");
+        console.log(store);
         //content_name: pageData[0].name, //product name
         content_category: store.name, //product category
         content_ids: _.map(store.products, function(product) {
