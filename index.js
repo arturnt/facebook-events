@@ -2,6 +2,7 @@ module.exports = function (config, pageType, pageData) {
 
   //check for preferred content type, otherwise default to 'product_group'
   var content_type = config.content_type || "product_group";
+  var feu = require('symphony-feu');
 
   function shouldFire(pageType, eventTrigger) {
     var check = false;
@@ -52,21 +53,25 @@ module.exports = function (config, pageType, pageData) {
       }
     },
     store: function(store) {
-      var productList = $('[ng-controller="ProductListCtrl"]').scope().productClusters;
-      var content = [];
-      _.forEach(productList, function(product) {
-        _.forEach(product.variants, function(variant) {
-          content.push(product.tagLine + "-" + variant.vendorSKUId);
-        })
-      })
+      feu.getCurrentProductList()
+        .then( function(productListCtrl) {
+          console.log("thenning!");
+          var productList = productListCtrl.productClusters;
+          var content = [];
+          _.forEach(productList, function(product) {
+            _.forEach(product.variants, function(variant) {
+              content.push(product.tagLine + "-" + variant.vendorSKUId);
+            })
+          })
 
-      fbq('track', 'ViewContent', {
-        //content_name: pageData[0].name, //product name
-        content_category: store.name, //product category
-        content_ids: content, //array of product SKUs
-        content_type: content_type, //determined by config
-        //value: pageData[0].msrpInCents/100, //product price – leave blank on category pages
-        currency: 'USD'
+          fbq('track', 'ViewContent', {
+            //content_name: pageData[0].name, //product name
+            content_category: store.name, //product category
+            content_ids: content, //array of product SKUs
+            content_type: content_type, //determined by config
+            //value: pageData[0].msrpInCents/100, //product price – leave blank on category pages
+            currency: 'USD'
+          });
       });
     },
     cart: function(cart) {
