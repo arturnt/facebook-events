@@ -22,6 +22,23 @@ module.exports = function (config, pageType, pageData) {
     return check;
   }
 
+  function createContent() {
+    return new Promise(function(resolve){
+      feu.getCurrentProductList().then(
+        function(productListCtrl) {
+          var productList = productListCtrl.productClusters;
+          var content_ids = [];
+
+          _.forEach(productList, function(product) {
+            _.forEach(product.variants, function(variant) {
+              content_ids.push(`${product.tagLine}-${variant.vendorSKUId}`);
+            })
+          });
+          resolve(content_ids);
+        });
+    })
+  }
+
   var variantSelected   = "";
   var pageTypes = {
     product: function(product) {
@@ -53,21 +70,12 @@ module.exports = function (config, pageType, pageData) {
       }
     },
     store: function(store) {
-      feu.getCurrentProductList()
-        .then( function(productListCtrl) {
-          console.log("thenning!");
-          var productList = productListCtrl.productClusters;
-          var content = [];
-          _.forEach(productList, function(product) {
-            _.forEach(product.variants, function(variant) {
-              content.push(product.tagLine + "-" + variant.vendorSKUId);
-            })
-          })
-
+      createContent()
+        .then(function (contents) {
           fbq('track', 'ViewContent', {
             //content_name: pageData[0].name, //product name
             content_category: store.name, //product category
-            content_ids: content, //array of product SKUs
+            content_ids: contents.slice(0,55), //array of product SKUs
             content_type: content_type, //determined by config
             //value: pageData[0].msrpInCents/100, //product price – leave blank on category pages
             currency: 'USD'
@@ -108,6 +116,7 @@ module.exports = function (config, pageType, pageData) {
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s);}(window,
   document,'script','//connect.facebook.net/en_US/fbevents.js');
 
+
   fbq('init', config.pixelId);
   fbq('track', 'PageView');
 
@@ -118,9 +127,13 @@ module.exports = function (config, pageType, pageData) {
   }
 
   Symphony.apiReady(["page", "product", "cart", "order", "store", function(page, product, cart, order, store) {
+
     if (window.location.pathname === '/search') {
       fbq('track', 'Search');
       return;
+    }
+
+    if (page.type === "store") {
     }
 
     var symphonyObj = {
@@ -130,7 +143,10 @@ module.exports = function (config, pageType, pageData) {
       product: product
     };
 
+
     var pageFunction = pageTypes[window.Symphony.pageType];
+
+
     pageFunction && pageFunction(symphonyObj[window.Symphony.pageType]);
   }]);
 
