@@ -99,6 +99,26 @@ module.exports = function (config) {
         });
       }
 
+      if(config.productPurchaseTypes) {
+        var purchaseType = false;
+        _.each(config.productPurchaseTypes, function(pt) {
+          var hasLineItemsMatching = _.filter(order.lineItems, function(lineItem) {
+            return pt.match == 'title' && lineItem.product.name.indexOf(pt.value) != -1;
+          }); 
+
+          if(hasLineItemsMatching && hasLineItemsMatching.length) {
+            purchaseType = pt.key;
+          }
+        });
+
+        if(purchaseType !== false) {
+          fbq('track', purchaseType, {
+            value: order.orderFinancial.subtotal / 100,
+            currency: 'USD'
+          });
+        }
+      }
+
       //Send the original purchase code as well
       fbq('track', 'Purchase' , {
         content_ids: _.map(order.lineItems, function (lineItem) {
