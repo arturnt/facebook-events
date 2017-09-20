@@ -95,7 +95,8 @@ module.exports = function (config) {
           }),
           content_type: content_type, //determined by config
           value: order.orderFinancial.subtotal / 100, //order subtotal
-          currency: 'USD'
+          currency: 'USD',
+          order_id: order.id
         });
       }
 
@@ -114,7 +115,8 @@ module.exports = function (config) {
         if(purchaseType !== false) {
           fbq('track', purchaseType, {
             value: order.orderFinancial.subtotal / 100,
-            currency: 'USD'
+            currency: 'USD',
+            order_id: order.id
           });
         }
       }
@@ -126,7 +128,8 @@ module.exports = function (config) {
         }),
         content_type: content_type, //determined by config
         value: order.orderFinancial.subtotal / 100, //order subtotal
-        currency: 'USD'
+        currency: 'USD',
+        order_id: order.id
       });
     }
   };
