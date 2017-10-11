@@ -1,3 +1,8 @@
+// this pixel needs to be seriously refactored. 
+// - Firing add to cart events on /cart pageload
+// - Not using any updates to cartdropdownctrl to fire add to cart
+// - shouldFire logic and the config is generally very confusing
+
 module.exports = function (config) {
 
   //check for preferred content type, otherwise default to 'product_group'
@@ -149,7 +154,7 @@ module.exports = function (config) {
     });
   }
 
-  Symphony.apiReady(["page", "product", "cart", "order", "store", function(page, product, cart, order, store) {
+  SymphonyAPI(["page", "product", "cart", "order", "store", function(page, product, cart, order, store) {
     if (window.location.pathname === '/search') {
       fbq('track', 'Search');
       return;
