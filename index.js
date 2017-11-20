@@ -45,9 +45,10 @@ module.exports = function (config, pageType, pageData) {
       fbq('track', 'ViewContent', {
         content_name: product[0].name, //product name -- should be product[0].name
         //content_category: 'Apparel & Accessories > Shoes', //product category
-        content_ids: _.map(product[0].variants, function(variant) { //array of product SKUs
-          return product[0].tagLine + "-" + variant.vendorSku;
-        }), 
+         content_ids: content_type === "product_group" ? product[0].tagLine :
+          _.map(product[0].variants, function (variant) { //array of product SKUs
+            return product[0].tagLine + "-" + variant.vendorSku;
+          }), 
         content_type: content_type, //determined by config
         value: product[0].defaultPriceInCents/100, //product price – leave blank on category pages
         currency: 'USD'
